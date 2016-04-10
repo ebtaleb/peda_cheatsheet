@@ -1,0 +1,95 @@
+import angr
+
+angr.Project?
+
+p = angr.Project('sample')
+
+path = p.factory.path()
+(curr ip)
+
+> step through one basic block til it reaches a branch
+path.step()
+
+succ = path.step()[0]
+
+succ.step()
+succ.state
+succ.state.regs.rax(rdi, rsi)
+
+succ.state.regs.edi = 6
+
+pg = p.factory.path_group(succ)
+
+pg.active
+pg.active[0].state.regs.rdi
+
+pg.step(n=10)
+pg.active[0].state.regs.rdi
+
+pg.active[0].state.memory.load(0x6006b0, 8)
+pg.active[0].state.memory.load(0x6006b0, 200)
+pg.factory.block(0x400468).vex.pp()
+
+
+state = p.factory.entry_state?
+
+state = p.factory.entry_state(args=['.sample', 'AAAA'])
+path = p.factory.path(state)
+
+path = path.step()[0]
+(lots of times) about 15 times
+
+p.factory.block(0x4004b6).pp()
+
+
+path = path.step?
+
+path = path.step(num_inst=2)[0]
+path.state.memory.load(path.state.regs.rsi, 8, endness='Iend_LE')
+
+path.state.memory.load(path.state.memory.load(path.state.regs.rsi, 8, endness='Iend_LE'), 1))
+
+path.state.memory.load(path.state.memory.load(8 + path.state.regs.rsi, 8, endness='Iend_LE'), 1))
+> ret 65 A
+
+path.state.posix.argv
+
+
+
+state = p.factory.entry_state(args=['.sample', 'AAAA'])
+
+import claripy
+
+state = p.factory.entry_state(args=['.sample', claripy.BVS('symvar', 32)])
+
+path.state.memory.load(path[0].state.regs.rbp - 1, 1)
+
+path.state.memory.load(path[0].state.regs.rbp - 1, 1) + 1
+AST symbolic expression
+
+path.state.se.simplify(path.state.regs.rax)
+
+
+find the value using the symbolic constraint (z3)
+
+path.state.se.add(path.state.se.simplify(path.state.regs.rax) == 0x42)
+
+path.state.se.any_int(path.state.memory.load(path.state.regs.rbp - 1, 1))
+65L
+
+pathgroup.active
+
+pathgroup.step(until=lambda pg: len(pg.active) > 1)
+pathgroup.active
+
+bdpath = pathgroup.active[0]
+
+newpg = p.factory.path_group(bdpath)
+newpg.step(n=10000)
+newpg.deadended[0]
+
+newpg.deadended[0].state.posix.dumps(1)
+newpg.deadended[0].state.posix.dumps(0)
+bytes could be ath, but we asked for a concretisation
+
+newpg.deadended[0].state.se.any_n_str(stdin.content.load(0, 18), 3)
